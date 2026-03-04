@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { FileUploader } from '@/app/components/FileUploader'
 
 const G = { gold: '#C9A84C', goldLight: '#E8C97A', goldDim: '#7a6230', ink: '#0D0B08', parchment: '#F5EDD8', green: '#4A9B7F', red: '#E05555', purple: '#7B6DB5', orange: '#C47A3A' }
 const TYPE_ICON: Record<string,string> = { trabajo:'📝', examen:'📋', foro:'💬', proyecto:'🏛', quiz:'⚡' }
@@ -191,17 +192,39 @@ function StudentView() {
                   </div>
                   {submitForm?.assignmentId===a.id && !mySub && (
                     <div style={{padding:'1rem 1.2rem',background:'rgba(255,255,255,0.02)'}}>
-                      <input value={submitForm.fileUrl} onChange={e=>setSubmitForm(p=>p?{...p,fileUrl:e.target.value}:p)} placeholder="URL del archivo (Google Drive, Dropbox...)"
-                        style={{width:'100%',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(201,168,76,0.2)',borderRadius:'5px',padding:'0.6rem 0.8rem',color:G.parchment,fontSize:'0.82rem',outline:'none',fontFamily:'Georgia, serif',marginBottom:'0.6rem',boxSizing:'border-box'}} />
-                      <textarea value={submitForm.content} onChange={e=>setSubmitForm(p=>p?{...p,content:e.target.value}:p)} placeholder="O escribe tu trabajo aquí..." rows={4}
-                        style={{width:'100%',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(201,168,76,0.2)',borderRadius:'5px',padding:'0.6rem 0.8rem',color:G.parchment,fontSize:'0.82rem',resize:'vertical',outline:'none',fontFamily:'Georgia, serif',marginBottom:'0.6rem',boxSizing:'border-box'}} />
-                      <div style={{display:'flex',gap:'0.5rem'}}>
-                        <button onClick={async()=>{
-                          const r=await fetch('/api/submissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({assignmentId:a.id,fileUrl:submitForm.fileUrl||null,content:submitForm.content||null})})
-                          if(r.ok){const s=await r.json();setSubmissions(p=>[...p,s]);setSubmitForm(null);showToast('Trabajo entregado ✓')}
-                        }} style={{padding:'0.55rem 1.2rem',background:G.gold,color:G.ink,border:'none',borderRadius:'5px',fontSize:'0.72rem',letterSpacing:'0.12em',cursor:'pointer',fontFamily:'Georgia, serif',fontWeight:'bold'}}>ENVIAR</button>
-                        <button onClick={()=>setSubmitForm(null)} style={{padding:'0.55rem 0.8rem',background:'transparent',border:'1px solid rgba(245,237,216,0.12)',borderRadius:'5px',color:'rgba(245,237,216,0.4)',fontSize:'0.72rem',cursor:'pointer'}}>CANCELAR</button>
-                      </div>
+                      <div style={{fontSize:'0.65rem',letterSpacing:'0.2em',color:G.goldDim,marginBottom:'0.75rem'}}>ENTREGA DE TRABAJO</div>
+                      {/* File upload */}
+                      {!submitForm.fileUrl ? (
+                        <div style={{marginBottom:'1rem'}}>
+                          <div style={{fontSize:'0.75rem',color:'rgba(245,237,216,0.5)',marginBottom:'0.5rem'}}>Subir archivo (Word, PDF, TXT)</div>
+                          <FileUploader
+                            onUpload={(result)=>setSubmitForm(p=>p?{...p,fileUrl:result.url,content:`Archivo: ${result.fileName} (${(result.fileSize/1024).toFixed(0)}KB)`}:p)}
+                            onCancel={()=>setSubmitForm(null)}
+                          />
+                        </div>
+                      ) : (
+                        <div style={{padding:'0.75rem',border:'1px solid rgba(74,155,127,0.25)',borderRadius:'6px',background:'rgba(74,155,127,0.05)',marginBottom:'0.75rem',display:'flex',alignItems:'center',gap:'0.75rem'}}>
+                          <span style={{fontSize:'1.2rem'}}>📘</span>
+                          <div style={{flex:1}}>
+                            <div style={{fontSize:'0.82rem',color:G.green}}>✓ Archivo listo para entregar</div>
+                            <div style={{fontSize:'0.7rem',color:'rgba(245,237,216,0.4)',marginTop:'0.1rem'}}>{submitForm.content}</div>
+                          </div>
+                          <button onClick={()=>setSubmitForm(p=>p?{...p,fileUrl:'',content:''}:p)} style={{background:'transparent',border:'none',color:'rgba(245,237,216,0.3)',cursor:'pointer',fontSize:'0.75rem'}}>Cambiar</button>
+                        </div>
+                      )}
+                      {/* Optional text */}
+                      <textarea value={submitForm.fileUrl?'':submitForm.content} onChange={e=>setSubmitForm(p=>p?{...p,content:e.target.value}:p)} placeholder="O escribe tu trabajo directamente aquí (sin subir archivo)..." rows={4}
+                        disabled={!!submitForm.fileUrl}
+                        style={{width:'100%',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(201,168,76,0.2)',borderRadius:'5px',padding:'0.6rem 0.8rem',color:G.parchment,fontSize:'0.82rem',resize:'vertical',outline:'none',fontFamily:'Georgia, serif',marginBottom:'0.6rem',boxSizing:'border-box',opacity:submitForm.fileUrl?0.3:1}} />
+                      {submitForm.fileUrl && (
+                        <div style={{display:'flex',gap:'0.5rem',marginTop:'0.5rem'}}>
+                          <button onClick={async()=>{
+                            const r=await fetch('/api/submissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({assignmentId:a.id,fileUrl:submitForm.fileUrl||null,content:submitForm.content||null})})
+                            if(r.ok){const s=await r.json();setSubmissions(p=>[...p,s]);setSubmitForm(null);showToast('Trabajo entregado ✓')}
+                          }} style={{padding:'0.55rem 1.2rem',background:G.gold,color:G.ink,border:'none',borderRadius:'5px',fontSize:'0.72rem',letterSpacing:'0.12em',cursor:'pointer',fontFamily:'Georgia, serif',fontWeight:'bold'}}>✓ CONFIRMAR ENTREGA</button>
+                          <button onClick={()=>setSubmitForm(null)} style={{padding:'0.55rem 0.8rem',background:'transparent',border:'1px solid rgba(245,237,216,0.12)',borderRadius:'5px',color:'rgba(245,237,216,0.4)',fontSize:'0.72rem',cursor:'pointer'}}>CANCELAR</button>
+                        </div>
+                      )}
                     </div>
                   )}
                   {mySub && (
