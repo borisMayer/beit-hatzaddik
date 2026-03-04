@@ -6,12 +6,23 @@ export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = async (e: React.MouseEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
+    if (!email || !password) { setError('Completa todos los campos'); return }
     setLoading(true)
-    await signIn('credentials', { email, password, callbackUrl: '/dashboard' })
-    setLoading(false)
+    setError('')
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+    if (result?.error) {
+      setError('Email o contraseña incorrectos. Verifica tus credenciales.')
+      setLoading(false)
+    } else {
+      window.location.href = '/'
+    }
   }
 
   return (
@@ -32,6 +43,7 @@ export default function SignInPage() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                 className="w-full bg-white/5 border border-[#C9A84C]/20 rounded px-4 py-3 text-[#F5EDD8] text-sm focus:outline-none focus:border-[#C9A84C]/50 transition-colors"
                 placeholder="tu@email.com"
               />
@@ -42,16 +54,24 @@ export default function SignInPage() {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                 className="w-full bg-white/5 border border-[#C9A84C]/20 rounded px-4 py-3 text-[#F5EDD8] text-sm focus:outline-none focus:border-[#C9A84C]/50 transition-colors"
                 placeholder="••••••••"
               />
             </div>
+
+            {error && (
+              <div className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded px-3 py-2 text-center">
+                {error}
+              </div>
+            )}
+
             <button
               onClick={handleSubmit}
               disabled={loading}
               className="w-full py-3 bg-[#C9A84C] text-[#0D0B08] font-cinzel font-semibold tracking-widest text-sm rounded hover:bg-[#E8C97A] transition-colors disabled:opacity-50 mt-2"
             >
-              {loading ? 'ENTRANDO...' : 'ENTRAR →'}
+              {loading ? 'VERIFICANDO...' : 'ENTRAR →'}
             </button>
           </div>
         </div>
