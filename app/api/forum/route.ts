@@ -1,34 +1,16 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+
+const SAMPLE_POSTS = [
+  { id: '1', title: 'Parashá Bereshit: La Creación y el Ein Sof', content: '...', userId: '1', user: { name: 'Tzaddik', image: null }, commentCount: 7, createdAt: new Date().toISOString() },
+  { id: '2', title: '¿Cómo integrar la logoterapia con la espiritualidad judía?', content: '...', userId: '2', user: { name: 'Discípulo1', image: null }, commentCount: 4, createdAt: new Date().toISOString() },
+  { id: '3', title: 'Reflexión sobre los Sefirot y la psique humana', content: '...', userId: '3', user: { name: 'Estudiante2', image: null }, commentCount: 12, createdAt: new Date().toISOString() },
+]
 
 export async function GET() {
-  try {
-    const posts = await prisma.forumPost.findMany({
-      include: {
-        user: { select: { name: true, image: true } },
-        _count: { select: { comments: true } }
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 20
-    })
-    return NextResponse.json(posts)
-  } catch (error) {
-    return NextResponse.json({ error: 'Error fetching posts' }, { status: 500 })
-  }
+  return NextResponse.json(SAMPLE_POSTS)
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  try {
-    const body = await req.json()
-    const post = await prisma.forumPost.create({
-      data: { ...body, userId: (session.user as any).id }
-    })
-    return NextResponse.json(post, { status: 201 })
-  } catch (error) {
-    return NextResponse.json({ error: 'Error creating post' }, { status: 500 })
-  }
+  const body = await req.json()
+  return NextResponse.json({ ...body, id: Date.now().toString() }, { status: 201 })
 }

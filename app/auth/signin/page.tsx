@@ -1,0 +1,61 @@
+'use client'
+import { signIn } from 'next-auth/react'
+import { useState } from 'react'
+
+export default function SignInPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    await signIn('credentials', { email, password, callbackUrl: '/dashboard' })
+    setLoading(false)
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(201,168,76,0.07)_0%,transparent_60%)] pointer-events-none" />
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="text-center mb-8">
+          <span className="text-4xl block mb-3" style={{filter:'drop-shadow(0 0 12px rgba(201,168,76,0.5))'}}>✡</span>
+          <h1 className="font-cinzel text-2xl text-[#C9A84C] tracking-widest">BEIT HATZADDIK</h1>
+          <p className="text-[#F5EDD8]/50 text-sm mt-2 italic">Ingresa al seminario</p>
+        </div>
+
+        <div className="border border-[#C9A84C]/20 rounded-lg p-8 bg-white/[0.02]">
+          <div className="space-y-4">
+            <div>
+              <label className="font-cinzel text-xs tracking-widest text-[#C9A84C]/70 block mb-2">EMAIL</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full bg-white/5 border border-[#C9A84C]/20 rounded px-4 py-3 text-[#F5EDD8] text-sm focus:outline-none focus:border-[#C9A84C]/50 transition-colors"
+                placeholder="tu@email.com"
+              />
+            </div>
+            <div>
+              <label className="font-cinzel text-xs tracking-widest text-[#C9A84C]/70 block mb-2">CONTRASEÑA</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full bg-white/5 border border-[#C9A84C]/20 rounded px-4 py-3 text-[#F5EDD8] text-sm focus:outline-none focus:border-[#C9A84C]/50 transition-colors"
+                placeholder="••••••••"
+              />
+            </div>
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full py-3 bg-[#C9A84C] text-[#0D0B08] font-cinzel font-semibold tracking-widest text-sm rounded hover:bg-[#E8C97A] transition-colors disabled:opacity-50 mt-2"
+            >
+              {loading ? 'ENTRANDO...' : 'ENTRAR →'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
