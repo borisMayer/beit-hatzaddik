@@ -1,14 +1,41 @@
 import Link from 'next/link'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await getServerSession(authOptions)
+  const isTzaddik = (session?.user as any)?.role === 'TZADDIK'
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      {/* Background glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(201,168,76,0.07)_0%,transparent_60%)] pointer-events-none" />
 
-      <div className="relative z-10 text-center max-w-3xl mx-auto">
+      {/* Top nav bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-3 border-b border-[#C9A84C]/10 bg-[#0D0B08]/80 backdrop-blur-sm">
+        <span className="font-cinzel text-xs tracking-[0.3em] text-[#C9A84C]">✡ BEIT HATZADDIK</span>
+        <div className="flex items-center gap-3">
+          {session ? (
+            <>
+              <span className="text-xs text-[#F5EDD8]/40 italic">{session.user?.email}</span>
+              {isTzaddik && (
+                <Link href="/tzaddik" className="font-cinzel text-xs tracking-widest px-4 py-1.5 bg-[#C9A84C] text-[#0D0B08] rounded hover:bg-[#E8C97A] transition-colors font-semibold">
+                  ⚙ PANEL TZADDIK
+                </Link>
+              )}
+              <Link href="/api/auth/signout" className="font-cinzel text-xs tracking-widest px-3 py-1.5 border border-[#F5EDD8]/15 text-[#F5EDD8]/40 rounded hover:border-[#F5EDD8]/30 transition-colors">
+                SALIR
+              </Link>
+            </>
+          ) : (
+            <Link href="/auth/signin" className="font-cinzel text-xs tracking-widest px-4 py-1.5 border border-[#C9A84C]/40 text-[#C9A84C] rounded hover:border-[#C9A84C] transition-colors">
+              INICIAR SESIÓN
+            </Link>
+          )}
+        </div>
+      </nav>
+
+      <div className="relative z-10 text-center max-w-3xl mx-auto mt-12">
         <span className="text-5xl mb-6 block" style={{filter:'drop-shadow(0 0 16px rgba(201,168,76,0.6))'}}>✡</span>
-        
         <h1 className="font-cinzel text-4xl md:text-6xl font-bold text-[#C9A84C] tracking-widest mb-2">
           BEIT HATZADDIK
         </h1>
@@ -33,7 +60,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Nav modules */}
       <div className="relative z-10 mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
         {[
           { icon: '📖', title: 'Aula Virtual', desc: 'Cursos y lecciones estructuradas', href: '/cursos' },
@@ -49,6 +75,15 @@ export default function HomePage() {
           </Link>
         ))}
       </div>
+
+      {/* Admin shortcut at bottom - only for Tzaddik */}
+      {isTzaddik && (
+        <div className="relative z-10 mt-8">
+          <Link href="/tzaddik" className="flex items-center gap-2 font-cinzel text-xs tracking-widest text-[#C9A84C]/60 hover:text-[#C9A84C] transition-colors border border-[#C9A84C]/15 hover:border-[#C9A84C]/35 px-5 py-2 rounded-full">
+            ⚙ PANEL DE ADMINISTRACIÓN
+          </Link>
+        </div>
+      )}
     </main>
   )
 }
