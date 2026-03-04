@@ -1,11 +1,10 @@
 'use client'
-import { useEffect, useSearchParams } from 'next/navigation' // wrong import, fix below
-import Link from 'next/link'
 import { Suspense } from 'react'
-import { useSearchParams as useParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
 function SuccessContent() {
-  const params = useParams()
+  const params = useSearchParams()
   const courseId = params.get('courseId')
   const type = params.get('type')
 
@@ -13,7 +12,7 @@ function SuccessContent() {
     <div style={{ minHeight: '100vh', background: '#0D0B08', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif' }}>
       <div style={{ textAlign: 'center', maxWidth: '420px', padding: '2rem' }}>
         <div style={{ fontSize: '3rem', marginBottom: '1rem', filter: 'drop-shadow(0 0 16px rgba(74,155,127,0.6))' }}>✡</div>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', letterSpacing: '0.2em', color: '#4A9B7F', marginBottom: '0.75rem' }}>¡PAGO APROBADO!</h1>
+        <h1 style={{ fontSize: '1.5rem', letterSpacing: '0.2em', color: '#4A9B7F', marginBottom: '0.75rem' }}>¡PAGO APROBADO!</h1>
         <p style={{ color: 'rgba(245,237,216,0.6)', fontStyle: 'italic', marginBottom: '0.5rem' }}>Tu acceso ha sido activado</p>
         <p style={{ color: 'rgba(245,237,216,0.35)', fontSize: '0.85rem', marginBottom: '2rem' }}>
           {type === 'subscription' ? 'Suscripción mensual activa — acceso completo al seminario' : 'Matrícula confirmada en el curso'}
@@ -38,6 +37,11 @@ function SuccessContent() {
     </div>
   )
 }
+
 export default function SuccessPage() {
-  return <Suspense><SuccessContent /></Suspense>
+  return (
+    <Suspense>
+      <SuccessContent />
+    </Suspense>
+  )
 }
