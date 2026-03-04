@@ -75,7 +75,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="text-3xl mb-4" style={{filter:'drop-shadow(0 0 12px rgba(201,168,76,0.5))'}}>✡</div>
+        <div className="text-3xl mb-4" style={{filter:'drop-shadow(0 0 12px rgba(201,168,76,0.5))'}}>🕎</div>
         <p className="font-cinzel text-xs tracking-[0.3em] text-[#C9A84C]/60 animate-pulse">CARGANDO...</p>
       </div>
     </div>
@@ -106,7 +106,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
   if (!session) return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
-        <div className="text-3xl mb-4">✡</div>
+        <div className="text-3xl mb-4">🕎</div>
         <h2 className="font-cinzel text-xl text-[#C9A84C] tracking-widest mb-3">ACCESO RESTRINGIDO</h2>
         <p className="text-[#F5EDD8]/50 italic mb-6">Inicia sesión para ver las lecciones</p>
         <Link href="/auth/signin" className="block py-3 bg-[#C9A84C] text-[#0D0B08] font-cinzel font-semibold tracking-widest text-sm rounded hover:bg-[#E8C97A] transition-colors text-center mb-3">
@@ -286,7 +286,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
               {/* Course complete banner */}
               {progressPct === 100 && (
                 <div style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid rgba(74,155,127,0.3)', borderRadius: '8px', background: 'rgba(74,155,127,0.05)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✡</div>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🕎</div>
                   <div style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', letterSpacing: '0.2em', color: '#4A9B7F', marginBottom: '0.3rem' }}>CURSO COMPLETADO</div>
                   <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.85rem', color: 'rgba(245,237,216,0.45)', fontStyle: 'italic' }}>
                     "Has caminado fielmente por el sendero del tzaddik"

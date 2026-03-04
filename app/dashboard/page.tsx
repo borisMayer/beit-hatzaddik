@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { Menorah } from '@/app/components/Menorah'
 
 type Course = { id: string; title: string; category: string; description: string; _count: { lessons: number } }
 type Enrollment = { id: string; courseId: string; createdAt: string; course: Course & { _count: { lessons: number } } }
@@ -81,7 +82,7 @@ export default function DashboardPage() {
   if (status === 'unauthenticated') return (
     <div style={{ minHeight: '100vh', background: G.ink, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>✡</div>
+        <div style={{display:"flex",justifyContent:"center"}}><Menorah size={60}/></div>
         <p style={{ fontFamily: 'Georgia, serif', color: 'rgba(201,168,76,0.6)', letterSpacing: '0.2em', marginBottom: '1.5rem' }}>ACCESO RESTRINGIDO</p>
         <Link href="/auth/signin" style={{ fontFamily: 'Georgia, serif', fontSize: '0.8rem', letterSpacing: '0.2em', padding: '0.75rem 2rem', background: G.gold, color: G.ink, borderRadius: '5px', textDecoration: 'none', fontWeight: 'bold' }}>INICIAR SESIÓN →</Link>
       </div>
@@ -159,7 +160,7 @@ export default function DashboardPage() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '0.65rem', letterSpacing: '0.3em', color: G.goldDim, marginBottom: '0.5rem', textTransform: 'uppercase' }}>Progreso Global</div>
                 <div style={{ fontSize: '1.1rem', color: globalPct === 100 ? '#4A9B7F' : G.parchment, marginBottom: '0.75rem' }}>
-                  {globalPct === 100 ? '¡Has completado todo el programa! ✡' :
+                  {globalPct === 100 ? '¡Has completado todo el programa! 🕎' :
                    globalPct >= 75 ? 'Estás en la recta final del camino' :
                    globalPct >= 50 ? 'Caminando firmemente por el sendero' :
                    globalPct >= 25 ? 'Comenzando a recorrer el camino' :

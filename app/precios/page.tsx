@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { Menorah } from '@/app/components/Menorah'
 
 const G = { gold: '#C9A84C', goldLight: '#E8C97A', ink: '#0D0B08', parchment: '#F5EDD8' }
 
@@ -45,7 +46,7 @@ export default function PreciosPage() {
       price: 'USD $19.99',
       period: '/ mes',
       color: G.gold,
-      icon: '✡',
+      icon: '🕎',
       featured: true,
       features: [
         'Acceso a TODOS los cursos',
@@ -85,7 +86,7 @@ export default function PreciosPage() {
 
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <Link href="/" style={{ fontSize: '0.7rem', letterSpacing: '0.25em', color: 'rgba(201,168,76,0.4)', textDecoration: 'none', display: 'block', marginBottom: '1.5rem' }}>← BEIT HATZADDIK</Link>
-          <div style={{ fontSize: '2.5rem', marginBottom: '1rem', filter: 'drop-shadow(0 0 12px rgba(201,168,76,0.4))' }}>✡</div>
+          <div style={{display:"flex",justifyContent:"center"}}><Menorah size={60}/></div>
           <h1 style={{ fontSize: '2rem', letterSpacing: '0.25em', color: G.gold, marginBottom: '0.75rem' }}>PLANES DE FORMACIÓN</h1>
           <p style={{ color: 'rgba(245,237,216,0.5)', fontStyle: 'italic', fontSize: '1.05rem' }}>
             Elige el camino que mejor se adapte a tu vocación espiritual

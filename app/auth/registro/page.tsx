@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { Menorah } from '@/app/components/Menorah'
 import { signIn } from 'next-auth/react'
 
 export default function RegistroPage() {
@@ -34,7 +35,7 @@ export default function RegistroPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(201,168,76,0.07)_0%,transparent_60%)] pointer-events-none" />
       <div className="relative z-10 text-center max-w-sm">
-        <div className="text-5xl mb-4" style={{filter:'drop-shadow(0 0 16px rgba(201,168,76,0.6))'}}>✡</div>
+        <div className="text-5xl mb-4" style={{filter:'drop-shadow(0 0 16px rgba(201,168,76,0.6))'}}>🕎</div>
         <h1 className="font-cinzel text-2xl text-[#C9A84C] tracking-widest mb-2">BARUCH HABA</h1>
         <p className="text-[#F5EDD8]/60 italic mb-1">Bienvenido a Beit HaTzaddik</p>
         <p className="text-[#F5EDD8]/40 text-sm mb-8">{form.name}</p>
@@ -59,7 +60,7 @@ export default function RegistroPage() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(201,168,76,0.07)_0%,transparent_60%)] pointer-events-none" />
       <div className="relative z-10 w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-4xl block mb-3" style={{filter:'drop-shadow(0 0 12px rgba(201,168,76,0.5))'}}>✡</span>
+          <span className="text-4xl block mb-3" style={{filter:'drop-shadow(0 0 12px rgba(201,168,76,0.5))'}}>🕎</span>
           <h1 className="font-cinzel text-2xl text-[#C9A84C] tracking-widest">ÚNETE AL SEMINARIO</h1>
           <p className="text-[#F5EDD8]/50 text-sm mt-2 italic">Crea tu cuenta de discípulo</p>
         </div>

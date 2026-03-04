@@ -1,4 +1,5 @@
 'use client'
+import { Menorah } from '@/app/components/Menorah'
 import { useState, useEffect } from 'react'
 
 export function PWAInstaller() {
@@ -40,7 +41,7 @@ export function PWAInstaller() {
 
   return (
     <div style={{ position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)', zIndex: 999, width: 'calc(100% - 3rem)', maxWidth: '420px', background: '#1a1608', border: '1px solid rgba(201,168,76,0.4)', borderRadius: '12px', padding: '1rem 1.2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-      <div style={{ fontSize: '2rem', flexShrink: 0, filter: 'drop-shadow(0 0 8px rgba(201,168,76,0.5))' }}>✡</div>
+      <div style={{ fontSize: '2rem', flexShrink: 0, filter: 'drop-shadow(0 0 8px rgba(201,168,76,0.5))' }}>🕎</div>
       <div style={{ flex: 1 }}>
         <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.8rem', letterSpacing: '0.15em', color: '#C9A84C', marginBottom: '0.2rem' }}>INSTALAR APP</div>
         <div style={{ fontSize: '0.75rem', color: 'rgba(245,237,216,0.55)' }}>Agrega Beit HaTzaddik a tu pantalla de inicio</div>

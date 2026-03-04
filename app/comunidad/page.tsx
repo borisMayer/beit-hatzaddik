@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { Menorah } from '@/app/components/Menorah'
 
 type User = { id: string; name: string | null; role: string; image: string | null }
 type Comment = { id: string; content: string; createdAt: string; user: User }
@@ -19,7 +20,7 @@ const timeAgo = (date: string) => {
 
 const RoleBadge = ({ role }: { role: string }) => {
   const color = role === 'TZADDIK' ? G.gold : role === 'STUDENT' ? '#4A9B7F' : '#6B7280'
-  const label = role === 'TZADDIK' ? '✡ Tzaddik' : role === 'STUDENT' ? 'Discípulo' : 'Visitante'
+  const label = role === 'TZADDIK' ? '🕎 Tzaddik' : role === 'STUDENT' ? 'Discípulo' : 'Visitante'
   return <span style={{ fontSize: '0.6rem', letterSpacing: '0.12em', padding: '0.12rem 0.5rem', borderRadius: '20px', border: `1px solid ${color}35`, color, background: `${color}10` }}>{label}</span>
 }
 
@@ -223,7 +224,7 @@ export default function ComunidadPage() {
         <main style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
           {!activePost && !showForm ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ fontSize: '3rem', filter: 'drop-shadow(0 0 16px rgba(201,168,76,0.3))' }}>✡</div>
+              <div style={{display:"flex",justifyContent:"center"}}><Menorah size={70}/></div>
               <p style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', letterSpacing: '0.2em', color: 'rgba(201,168,76,0.4)' }}>BEIT HATZADDIK</p>
               <p style={{ color: 'rgba(245,237,216,0.25)', fontStyle: 'italic', fontSize: '0.88rem' }}>Selecciona un post para leer o crea uno nuevo</p>
             </div>

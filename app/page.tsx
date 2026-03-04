@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Menorah } from '@/app/components/Menorah'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
@@ -12,7 +13,7 @@ export default async function HomePage() {
 
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-3 border-b border-[#C9A84C]/10 bg-[#0D0B08]/80 backdrop-blur-sm">
-        <span className="font-cinzel text-xs tracking-[0.3em] text-[#C9A84C]">✡ BEIT HATZADDIK</span>
+        <span className="font-cinzel text-xs tracking-[0.3em] text-[#C9A84C]">🕎 BEIT HATZADDIK</span>
         <div className="flex items-center gap-3">
           {session ? (
             <>
@@ -40,7 +41,7 @@ export default async function HomePage() {
       </nav>
 
       <div className="relative z-10 text-center max-w-3xl mx-auto mt-12">
-        <span className="text-5xl mb-6 block" style={{filter:'drop-shadow(0 0 16px rgba(201,168,76,0.6))'}}>✡</span>
+        <div className="mb-6 flex justify-center" style={{filter:'drop-shadow(0 0 20px rgba(201,168,76,0.5))'}}><Menorah size={90}/></div>
         <h1 className="font-cinzel text-4xl md:text-6xl font-bold text-[#C9A84C] tracking-widest mb-2">BEIT HATZADDIK</h1>
         <p className="font-cinzel text-sm tracking-[0.4em] text-[#F5EDD8]/50 mb-6">SEMINARIO VIRTUAL DE FORMACIÓN ESPIRITUAL</p>
         <p className="text-[#F5EDD8]/70 text-lg italic leading-relaxed mb-10">

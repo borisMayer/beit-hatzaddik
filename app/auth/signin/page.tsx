@@ -2,6 +2,7 @@
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import Link from 'next/link'
+import { Menorah } from '@/app/components/Menorah'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
@@ -22,7 +23,7 @@ export default function SignInPage() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(201,168,76,0.07)_0%,transparent_60%)] pointer-events-none" />
       <div className="relative z-10 w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-4xl block mb-3" style={{filter:'drop-shadow(0 0 12px rgba(201,168,76,0.5))'}}>✡</span>
+          <span className="text-4xl block mb-3" style={{filter:'drop-shadow(0 0 12px rgba(201,168,76,0.5))'}}>🕎</span>
           <h1 className="font-cinzel text-2xl text-[#C9A84C] tracking-widest">BEIT HATZADDIK</h1>
           <p className="text-[#F5EDD8]/50 text-sm mt-2 italic">Ingresa al seminario</p>
         </div>

@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Menorah } from '@/app/components/Menorah'
 
 function ExitoContent() {
   const params = useSearchParams()
@@ -15,7 +16,7 @@ function ExitoContent() {
   return (
     <div style={{ minHeight: '100vh', background: '#0D0B08', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif' }}>
       <div style={{ textAlign: 'center', maxWidth: '420px', padding: '2rem' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem', filter: 'drop-shadow(0 0 20px rgba(74,155,127,0.6))' }}>✡</div>
+        <div style={{display:"flex",justifyContent:"center"}}><Menorah size={70}/></div>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', letterSpacing: '0.2em', color: '#4A9B7F', marginBottom: '0.5rem' }}>¡PAGO EXITOSO!</h1>
         <p style={{ color: 'rgba(245,237,216,0.5)', fontStyle: 'italic', marginBottom: '0.5rem' }}>
           {type === 'SUBSCRIPTION' ? 'Tu suscripción mensual está activa' : 'Tu matrícula ha sido confirmada'}

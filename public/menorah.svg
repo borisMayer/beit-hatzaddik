@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="none">
+  <!-- Base pedestal -->
+  <rect x="35" y="112" width="30" height="5" rx="2.5" fill="#C9A84C"/>
+  <rect x="42" y="108" width="16" height="6" rx="2" fill="#C9A84C"/>
+  
+  <!-- Central stem -->
+  <rect x="47.5" y="60" width="5" height="50" rx="2.5" fill="#C9A84C"/>
+
+  <!-- Arms curve up from center bar -->
+  <!-- Inner left arm -->
+  <path d="M50 80 Q35 80 35 65" stroke="#C9A84C" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Mid left arm -->
+  <path d="M50 80 Q20 80 20 62" stroke="#C9A84C" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Outer left arm -->
+  <path d="M50 80 Q5 80 5 59" stroke="#C9A84C" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Inner right arm -->
+  <path d="M50 80 Q65 80 65 65" stroke="#C9A84C" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Mid right arm -->
+  <path d="M50 80 Q80 80 80 62" stroke="#C9A84C" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Outer right arm -->
+  <path d="M50 80 Q95 80 95 59" stroke="#C9A84C" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- 7 Flames — outer left to outer right, heights vary (outer shorter, center tallest) -->
+  <!-- Outer left -->
+  <path d="M5 57 C3 50 2 44 5 39 C7 44 9 49 8 54 C10 48 12 42 10 36 C13 42 13 50 10 55 C11 49 14 44 12 38 C15 45 14 52 10 57 Z" fill="#C9A84C"/>
+  <path d="M6 55 C5 50 5 45 7 41 C9 46 8 52 6 55 Z" fill="#E8C97A" opacity="0.7"/>
+
+  <!-- Mid left -->
+  <path d="M20 60 C18 52 17 45 20 39 C22 45 24 51 23 57 C25 50 27 43 25 36 C28 43 28 52 25 58 C26 51 29 45 27 38 C30 46 29 54 25 60 Z" fill="#C9A84C"/>
+  <path d="M21 58 C20 52 20 46 22 41 C24 47 23 54 21 58 Z" fill="#E8C97A" opacity="0.7"/>
+
+  <!-- Inner left -->
+  <path d="M35 63 C33 55 32 47 35 41 C37 47 39 54 38 60 C40 53 42 46 40 38 C43 46 43 55 40 62 C41 55 44 49 42 41 C45 49 44 57 40 63 Z" fill="#C9A84C"/>
+  <path d="M36 61 C35 55 35 49 37 43 C39 49 38 57 36 61 Z" fill="#E8C97A" opacity="0.7"/>
+
+  <!-- Center (tallest) -->
+  <path d="M50 60 C47 50 46 40 50 32 C53 40 56 50 54 57 C57 48 59 39 57 30 C61 39 61 50 58 58 C59 50 63 43 61 34 C65 44 64 54 60 60 Z" fill="#C9A84C"/>
+  <path d="M51 58 C49 51 49 43 51 36 C54 43 53 52 51 58 Z" fill="#E8C97A" opacity="0.7"/>
+
+  <!-- Inner right -->
+  <path d="M65 63 C63 55 62 47 65 41 C67 47 69 54 68 60 C70 53 72 46 70 38 C73 46 73 55 70 62 C71 55 74 49 72 41 C75 49 74 57 70 63 Z" fill="#C9A84C"/>
+  <path d="M66 61 C65 55 65 49 67 43 C69 49 68 57 66 61 Z" fill="#E8C97A" opacity="0.7"/>
+
+  <!-- Mid right -->
+  <path d="M80 60 C78 52 77 45 80 39 C82 45 84 51 83 57 C85 50 87 43 85 36 C88 43 88 52 85 58 C86 51 89 45 87 38 C90 46 89 54 85 60 Z" fill="#C9A84C"/>
+  <path d="M81 58 C80 52 80 46 82 41 C84 47 83 54 81 58 Z" fill="#E8C97A" opacity="0.7"/>
+
+  <!-- Outer right -->
+  <path d="M95 57 C93 50 92 44 95 39 C97 44 99 49 98 54 C100 48 102 42 100 36 C103 42 103 50 100 55 C101 49 104 44 102 38 C105 45 104 52 100 57 Z" fill="#C9A84C"/>
+  <path d="M96 55 C95 50 95 45 97 41 C99 46 98 52 96 55 Z" fill="#E8C97A" opacity="0.7"/>
+</svg>

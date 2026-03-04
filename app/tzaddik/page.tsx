@@ -1,4 +1,5 @@
 'use client'
+import { Menorah } from '@/app/components/Menorah'
 import { useState, useEffect, useCallback } from 'react'
 
 type Stats = { users: number; courses: number; enrollments: number; posts: number }
@@ -202,7 +203,7 @@ export default function TzaddikPanel() {
         {/* Sidebar */}
         <aside style={{ width: '220px', borderRight: '1px solid rgba(201,168,76,0.1)', padding: '2rem 0', flexShrink: 0, background: 'rgba(0,0,0,0.25)' }}>
           <div style={{ padding: '0 1.5rem 1.75rem', borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
-            <div style={{ fontSize: '1.4rem', marginBottom: '0.4rem', filter: 'drop-shadow(0 0 8px rgba(201,168,76,0.45))' }}>✡</div>
+            <div style={{ fontSize: '1.4rem', marginBottom: '0.4rem', filter: 'drop-shadow(0 0 8px rgba(201,168,76,0.45))' }}>🕎</div>
             <div style={{ fontSize: '0.6rem', letterSpacing: '0.3em', color: G.gold, textTransform: 'uppercase' }}>Panel del</div>
             <div style={{ fontSize: '1.05rem', letterSpacing: '0.12em', color: G.goldLight, fontWeight: 'bold' }}>Tzaddik</div>
           </div>
