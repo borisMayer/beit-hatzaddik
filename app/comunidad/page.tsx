@@ -123,9 +123,20 @@ export default function ComunidadPage() {
 
   const deleteComment = async (commentId: string) => {
     if (!activePost) return
-    const r = await fetch(`/api/forum/${activePost.id}/comments`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commentId }) })
+    const postId = activePost.id
+    const r = await fetch(`/api/forum/${postId}/comments`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ commentId })
+    })
     if (r.ok) {
-      setActivePost(p => p ? { ...p, comments: p.comments?.filter(c => c.id !== commentId), _count: { comments: p._count.comments - 1 } } : p)
+      // Reload full post instead of partial state mutation
+      const refresh = await fetch(`/api/forum/${postId}`)
+      if (refresh.ok) {
+        const updated = await refresh.json()
+        setActivePost(updated)
+        setPosts(p => p.map(post => post.id === postId ? { ...post, _count: { comments: updated._count?.comments ?? 0 } } : post))
+      }
       showToast('Comentario eliminado')
     }
   }
