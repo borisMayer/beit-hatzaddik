@@ -13,7 +13,7 @@ const scoreLabel = (s: number) => s >= 90 ? 'Excelente' : s >= 70 ? 'Bueno' : s 
 
 type Course = { id: string; title: string; category: string }
 type Assignment = { id: string; courseId: string; title: string; description: string | null; type: string; weight: number; dueDate: string | null; _count: { submissions: number; grades: number } }
-type Grade = { id: string; assignmentId: string; score: number; comment: string | null; gradedAt: string; assignment: { title: string; weight: number; course: { id: string; title: string; category: string } } }
+type Grade = { id: string; assignmentId: string; userId: string; score: number; comment: string | null; gradedAt: string; assignment: { title: string; weight: number; course: { id: string; title: string; category: string } } }
 type Submission = { id: string; assignmentId: string; fileUrl: string | null; content: string | null; submittedAt: string; feedback: string | null; feedbackAt: string | null; assignment: { title: string; type: string; weight: number }; user?: { id: string; name: string | null; email: string } }
 type Student = { id: string; name: string | null; email: string; role: string }
 
