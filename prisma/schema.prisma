@@ -21,6 +21,8 @@ model User {
   posts         ForumPost[]
   comments      ForumComment[]
   progress      Progress[]
+  payments      Payment[]
+  subscription  Subscription?
 }
 
 enum Role {
@@ -36,13 +38,18 @@ model Course {
   category    String
   imageUrl    String?
   published   Boolean  @default(false)
+  price       Float    @default(0)
+  isFree      Boolean  @default(true)
   order       Int      @default(0)
+  price       Float?
+  isFree      Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   lessons     Lesson[]
   enrollments Enrollment[]
   forumPosts  ForumPost[]
+  payments    Payment[]
 }
 
 model Lesson {
@@ -81,6 +88,55 @@ model Progress {
   @@unique([userId, lessonId])
 }
 
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  courseId        String?
+  type            PaymentType
+  status          PaymentStatus @default(PENDING)
+  amount          Float
+  currency        String        @default("USD")
+  mpPaymentId     String?       @unique
+  mpPreferenceId  String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt @default(now())
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course?       @relation(fields: [courseId], references: [id])
+}
+
+enum PaymentType {
+  COURSE
+  SUBSCRIPTION
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model Subscription {
+  id          String             @id @default(cuid())
+  userId      String             @unique
+  status      SubscriptionStatus @default(ACTIVE)
+  plan        String             @default("monthly")
+  amount      Float
+  currency    String             @default("USD")
+  startsAt    DateTime           @default(now())
+  expiresAt   DateTime
+  createdAt   DateTime           @default(now())
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
 model SacredText {
   id          String   @id @default(cuid())
   title       String
@@ -115,4 +171,18 @@ model ForumComment {
 
   post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String?
+  type        String   // "course" | "subscription"
+  amount      Float
+  currency    String   @default("USD")
+  status      String   // "pending" | "approved" | "rejected"
+  mpPaymentId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -5,7 +5,7 @@ type Stats = { users: number; courses: number; enrollments: number; posts: numbe
 type User = { id: string; name: string | null; email: string; role: string; createdAt: string; _count: { enrollments: number; posts: number } }
 type Course = { id: string; title: string; description: string; category: string; published: boolean; order: number; _count: { lessons: number; enrollments: number } }
 type Lesson = { id: string; courseId: string; title: string; content: string; videoUrl: string | null; order: number }
-type Tab = 'dashboard' | 'students' | 'courses' | 'new-course' | 'lessons'
+type Tab = 'dashboard' | 'students' | 'courses' | 'new-course' | 'lessons' | 'payments'
 
 const G = { gold: '#C9A84C', goldLight: '#E8C97A', goldDim: '#7a6230', ink: '#0D0B08', parchment: '#F5EDD8' }
 
@@ -27,6 +27,72 @@ const input = (extra?: object) => ({
 
 const label = { display: 'block', fontSize: '0.62rem', letterSpacing: '0.25em', color: 'rgba(201,168,76,0.65)', marginBottom: '0.4rem' } as const
 const card = { padding: '1.4rem', border: '1px solid rgba(201,168,76,0.14)', borderRadius: '8px', background: 'rgba(255,255,255,0.02)' } as const
+
+
+function PaymentsTab() {
+  const [data, setData] = useState<{payments: any[], total: number} | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/admin/payments').then(r => r.json()).then(setData).finally(() => setLoading(false))
+  }, [])
+
+  const statusColor = (s: string) => s === 'approved' ? '#4A9B7F' : s === 'rejected' ? '#E05555' : '#C9A84C'
+  const statusLabel = (s: string) => s === 'approved' ? 'APROBADO' : s === 'rejected' ? 'RECHAZADO' : 'PENDIENTE'
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+        <div>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', letterSpacing: '0.2em', color: '#C9A84C', marginBottom: '0.3rem' }}>PAGOS</h1>
+          <p style={{ color: 'rgba(245,237,216,0.4)', fontSize: '0.88rem', fontStyle: 'italic' }}>Historial de transacciones</p>
+        </div>
+        <a href="/precios" target="_blank" style={{ padding: '0.5rem 1.1rem', background: '#C9A84C', color: '#0D0B08', borderRadius: '5px', textDecoration: 'none', fontSize: '0.72rem', letterSpacing: '0.15em', fontFamily: 'Georgia, serif', fontWeight: 'bold' }}>VER PÁGINA DE PRECIOS ↗</a>
+      </div>
+
+      {!loading && data && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+          {[
+            { label: 'Total Recaudado', value: `USD $${data.total.toFixed(2)}`, color: '#4A9B7F' },
+            { label: 'Pagos Aprobados', value: data.payments.filter(p => p.status === 'approved').length, color: '#C9A84C' },
+            { label: 'Total Transacciones', value: data.payments.length, color: '#7B6DB5' },
+          ].map(s => (
+            <div key={s.label} style={{ padding: '1.2rem', border: '1px solid rgba(201,168,76,0.12)', borderRadius: '8px', background: 'rgba(255,255,255,0.02)' }}>
+              <div style={{ fontSize: '1.6rem', fontWeight: 'bold', color: s.color }}>{s.value}</div>
+              <div style={{ fontSize: '0.65rem', letterSpacing: '0.2em', color: 'rgba(245,237,216,0.38)', marginTop: '0.25rem', textTransform: 'uppercase' }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {loading ? <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(245,237,216,0.3)', fontStyle: 'italic' }}>Cargando...</div> :
+        !data?.payments.length ? (
+          <div style={{ textAlign: 'center', padding: '3rem', border: '1px dashed rgba(201,168,76,0.12)', borderRadius: '8px' }}>
+            <p style={{ color: 'rgba(245,237,216,0.3)', fontStyle: 'italic' }}>Aún no hay transacciones registradas</p>
+          </div>
+        ) : (
+          <div style={{ border: '1px solid rgba(201,168,76,0.12)', borderRadius: '8px', overflow: 'hidden' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', gap: '0.75rem', padding: '0.65rem 1.2rem', background: 'rgba(201,168,76,0.04)', borderBottom: '1px solid rgba(201,168,76,0.08)', fontSize: '0.6rem', letterSpacing: '0.22em', color: 'rgba(201,168,76,0.55)', textTransform: 'uppercase' }}>
+              <span>Usuario</span><span>Tipo</span><span>Monto</span><span>Estado</span><span>Fecha</span>
+            </div>
+            {data.payments.map((p: any, i: number) => (
+              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', gap: '0.75rem', padding: '0.85rem 1.2rem', alignItems: 'center', borderBottom: i < data.payments.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none', background: i%2===0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
+                <div>
+                  <div style={{ fontSize: '0.85rem', color: '#F5EDD8' }}>{p.user?.name ?? '—'}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(245,237,216,0.35)' }}>{p.user?.email}</div>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'rgba(245,237,216,0.55)' }}>{p.type === 'subscription' ? '🔄 Suscripción' : '📖 Curso'}</div>
+                <div style={{ fontSize: '0.88rem', color: '#4A9B7F', fontWeight: 'bold' }}>USD ${p.amount.toFixed(2)}</div>
+                <div><span style={{ fontSize: '0.65rem', letterSpacing: '0.1em', padding: '0.15rem 0.55rem', borderRadius: '20px', border: `1px solid ${statusColor(p.status)}40`, color: statusColor(p.status), background: `${statusColor(p.status)}10` }}>{statusLabel(p.status)}</span></div>
+                <div style={{ fontSize: '0.72rem', color: 'rgba(245,237,216,0.35)' }}>{new Date(p.createdAt).toLocaleDateString('es')}</div>
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  )
+}
 
 export default function TzaddikPanel() {
   const [tab, setTab] = useState<Tab>('dashboard')
@@ -111,6 +177,7 @@ export default function TzaddikPanel() {
     { id: 'students', label: 'Discípulos', icon: '🕊' },
     { id: 'courses', label: 'Cursos', icon: '📖' },
     { id: 'new-course', label: 'Nuevo Curso', icon: '+' },
+    { id: 'payments', label: 'Pagos', icon: '💳' },
   ]
 
   const sectionTitle = (title: string, subtitle?: string) => (
@@ -391,6 +458,11 @@ export default function TzaddikPanel() {
                 )
               }
             </div>
+          )}
+
+          {/* ── PAYMENTS ── */}
+          {tab === 'payments' && (
+            <PaymentsTab />
           )}
         </main>
       </div>

@@ -50,6 +50,7 @@ export default async function HomePage() {
           <Link href="/cursos" className="px-8 py-3 bg-[#C9A84C] text-[#0D0B08] font-cinzel font-semibold tracking-widest text-sm rounded hover:bg-[#E8C97A] transition-colors">VER CURSOS</Link>
           <Link href="/biblioteca" className="px-8 py-3 border border-[#C9A84C]/40 text-[#C9A84C] font-cinzel tracking-widest text-sm rounded hover:border-[#C9A84C] transition-colors">BIBLIOTECA SAGRADA</Link>
           <Link href="/comunidad" className="px-8 py-3 border border-[#F5EDD8]/20 text-[#F5EDD8]/60 font-cinzel tracking-widest text-sm rounded hover:border-[#F5EDD8]/40 transition-colors">COMUNIDAD</Link>
+          <Link href="/precios" className="px-8 py-3 border border-[#C9A84C]/40 text-[#C9A84C] font-cinzel tracking-widest text-sm rounded hover:bg-[#C9A84C]/10 transition-colors">PRECIOS</Link>
         </div>
       </div>
 
