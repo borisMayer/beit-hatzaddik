@@ -7,6 +7,8 @@ type Course = { id: string; title: string; category: string; description: string
 type Enrollment = { id: string; courseId: string; createdAt: string; course: Course & { _count: { lessons: number } } }
 type Progress = { lessonId: string; completed: boolean }
 type ForumPost = { id: string; title: string; createdAt: string; _count: { comments: number } }
+type Grade = { id: string; assignmentId: string; userId: string; score: number; comment: string | null; assignment: { title: string; weight: number; course: { id: string; title: string; category: string } } }
+type Assignment = { id: string; courseId: string; title: string; weight: number; type: string }
 
 const G = { gold: '#C9A84C', goldLight: '#E8C97A', goldDim: '#7a6230', ink: '#0D0B08', parchment: '#F5EDD8' }
 
@@ -20,6 +22,9 @@ const timeAgo = (date: string) => {
   if (diff < 2592000) return `hace ${Math.floor(diff/86400)}d`
   return new Date(date).toLocaleDateString('es', { day: 'numeric', month: 'short' })
 }
+
+const scoreColor = (s: number) => s >= 90 ? '#4A9B7F' : s >= 70 ? '#C9A84C' : s >= 50 ? '#C47A3A' : '#E05555'
+const scoreLabel = (s: number) => s >= 90 ? 'Excelente' : s >= 70 ? 'Bueno' : s >= 50 ? 'Suficiente' : 'Insuficiente'
 
 const Ring = ({ pct, size = 80, color = G.gold }: { pct: number; size?: number; color?: string }) => {
   const r = (size - 10) / 2
@@ -46,6 +51,9 @@ export default function DashboardPage() {
   const [progress, setProgress] = useState<Progress[]>([])
   const [posts, setPosts] = useState<ForumPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [grades, setGrades] = useState<Grade[]>([])
+  const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [showNotasDetail, setShowNotasDetail] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') return
@@ -54,12 +62,18 @@ export default function DashboardPage() {
       fetch('/api/enrollments').then(r => r.json()),
       fetch('/api/progress').then(r => r.json()),
       fetch('/api/forum').then(r => r.json()),
-    ]).then(([enr, prog, forum]) => {
+      fetch('/api/grades').then(r => r.json()),
+    ]).then(([enr, prog, forum, gr]) => {
       setEnrollments(Array.isArray(enr) ? enr : [])
       setProgress(Array.isArray(prog) ? prog : [])
-      // Filter posts by current user
       const userId = (session?.user as any)?.id
       setPosts(Array.isArray(forum) ? forum.filter((p: any) => p.user?.id === userId).slice(0, 5) : [])
+      setGrades(Array.isArray(gr) ? gr : [])
+      // Fetch all assignments for enrolled courses
+      if (Array.isArray(enr) && enr.length > 0) {
+        Promise.all(enr.map((e: any) => fetch(`/api/assignments?courseId=${e.courseId}`).then(r => r.json())))
+          .then(results => setAssignments(results.flat().filter(Boolean)))
+      }
       setLoading(false)
     })
   }, [status, session])
@@ -194,6 +208,107 @@ export default function DashboardPage() {
                     )
                   })}
                 </div>
+              )}
+            </div>
+
+            {/* MIS NOTAS */}
+            <div style={{ marginBottom: '2.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
+                <div style={{ fontSize: '0.65rem', letterSpacing: '0.3em', color: G.goldDim, textTransform: 'uppercase' }}>📊 Mis Notas</div>
+                {grades.length > 0 && (
+                  <button onClick={() => setShowNotasDetail(p => !p)}
+                    style={{ background: 'transparent', border: `1px solid rgba(201,168,76,0.2)`, borderRadius: '20px', padding: '0.25rem 0.75rem', color: G.gold, fontSize: '0.68rem', letterSpacing: '0.12em', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
+                    {showNotasDetail ? 'VER MENOS ↑' : 'VER DETALLE ↓'}
+                  </button>
+                )}
+              </div>
+
+              {grades.length === 0 && assignments.length === 0 ? (
+                <div style={{ padding: '1.5rem', border: '1px dashed rgba(201,168,76,0.1)', borderRadius: '8px', textAlign: 'center' }}>
+                  <p style={{ color: 'rgba(245,237,216,0.3)', fontStyle: 'italic', fontSize: '0.85rem', marginBottom: '0.75rem' }}>Aún no tienes evaluaciones calificadas</p>
+                  <Link href="/academico" style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: G.gold, textDecoration: 'none', fontFamily: 'Georgia, serif' }}>VER ACADÉMICO →</Link>
+                </div>
+              ) : (
+                <>
+                  {/* Summary cards per course */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {enrollments.map(e => {
+                      const courseAssignments = assignments.filter(a => a.courseId === e.courseId)
+                      const courseGrades = grades.filter(g => g.assignment.course.id === e.courseId)
+                      const color = categoryColor[e.course.category] ?? G.gold
+                      // Weighted average
+                      let ws = 0, tw = 0
+                      courseGrades.forEach(g => {
+                        const a = courseAssignments.find(a => a.id === g.assignmentId)
+                        if (a) { ws += g.score * (a.weight / 100); tw += a.weight / 100 }
+                      })
+                      const avg = tw > 0 ? Math.round((ws / tw) * 10) / 10 : null
+                      const pending = courseAssignments.length - courseGrades.length
+
+                      return (
+                        <div key={e.id} style={{ border: `1px solid rgba(201,168,76,0.12)`, borderRadius: '8px', overflow: 'hidden', background: 'rgba(255,255,255,0.02)' }}>
+                          {/* Course header */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.85rem 1.2rem', borderBottom: showNotasDetail && courseAssignments.length > 0 ? '1px solid rgba(255,255,255,0.05)' : 'none', borderLeft: `3px solid ${color}` }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: '0.62rem', letterSpacing: '0.15em', color, marginBottom: '0.15rem', textTransform: 'uppercase' }}>{e.course.category}</div>
+                              <div style={{ fontSize: '0.9rem', color: G.parchment }}>{e.course.title}</div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexShrink: 0 }}>
+                              {pending > 0 && <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'rgba(245,237,216,0.3)' }}>{pending}</div>
+                                <div style={{ fontSize: '0.58rem', letterSpacing: '0.1em', color: 'rgba(245,237,216,0.25)' }}>PENDIENTES</div>
+                              </div>}
+                              <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '1.6rem', fontWeight: 'bold', color: avg !== null ? scoreColor(avg) : 'rgba(245,237,216,0.2)', lineHeight: 1 }}>
+                                  {avg !== null ? avg : '—'}
+                                </div>
+                                <div style={{ fontSize: '0.58rem', letterSpacing: '0.1em', color: avg !== null ? scoreColor(avg) : 'rgba(245,237,216,0.25)' }}>
+                                  {avg !== null ? scoreLabel(avg).toUpperCase() : 'SIN NOTAS'}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Detail rows - only when expanded */}
+                          {showNotasDetail && courseAssignments.length > 0 && (
+                            <div>
+                              {courseAssignments.map((a, i) => {
+                                const g = courseGrades.find(g => g.assignmentId === a.id)
+                                return (
+                                  <div key={a.id} style={{ display: 'grid', gridTemplateColumns: '1fr 60px 70px', gap: '0.5rem', padding: '0.6rem 1.2rem', alignItems: 'center', borderBottom: i < courseAssignments.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
+                                    <div style={{ fontSize: '0.82rem', color: 'rgba(245,237,216,0.65)' }}>{a.title}</div>
+                                    <div style={{ fontSize: '0.68rem', color: 'rgba(245,237,216,0.3)', textAlign: 'center' }}>{a.weight}%</div>
+                                    <div style={{ textAlign: 'center' }}>
+                                      {g ? (
+                                        <span style={{ fontSize: '1rem', fontWeight: 'bold', color: scoreColor(g.score) }}>{g.score}</span>
+                                      ) : (
+                                        <span style={{ fontSize: '0.7rem', color: 'rgba(245,237,216,0.2)', fontStyle: 'italic' }}>—</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                              {/* Course average row */}
+                              {avg !== null && (
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 70px', gap: '0.5rem', padding: '0.6rem 1.2rem', background: `${color}08`, borderTop: `1px solid ${color}20` }}>
+                                  <div style={{ fontSize: '0.7rem', letterSpacing: '0.15em', color }}>PROMEDIO PONDERADO</div>
+                                  <div />
+                                  <div style={{ textAlign: 'center', fontSize: '1.1rem', fontWeight: 'bold', color: scoreColor(avg) }}>{avg}</div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div style={{ marginTop: '0.85rem', textAlign: 'right' }}>
+                    <Link href="/academico" style={{ fontSize: '0.72rem', letterSpacing: '0.15em', color: 'rgba(201,168,76,0.5)', textDecoration: 'none', fontFamily: 'Georgia, serif' }}>
+                      VER PORTAL ACADÉMICO COMPLETO →
+                    </Link>
+                  </div>
+                </>
               )}
             </div>
 
