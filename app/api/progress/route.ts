@@ -5,16 +5,13 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!session) return NextResponse.json([])
   try {
     const progress = await prisma.progress.findMany({
-      where: { userId: (session.user as any).id },
-      include: { lesson: { select: { title: true, courseId: true } } }
+      where: { userId: (session.user as any).id }
     })
     return NextResponse.json(progress)
-  } catch {
-    return NextResponse.json({ error: 'DB not ready' }, { status: 500 })
-  }
+  } catch { return NextResponse.json([]) }
 }
 
 export async function POST(req: Request) {
@@ -28,7 +25,5 @@ export async function POST(req: Request) {
       create: { userId: (session.user as any).id, lessonId, completed }
     })
     return NextResponse.json(progress)
-  } catch {
-    return NextResponse.json({ error: 'Error updating progress' }, { status: 500 })
-  }
+  } catch { return NextResponse.json({ error: 'Error' }, { status: 500 }) }
 }
