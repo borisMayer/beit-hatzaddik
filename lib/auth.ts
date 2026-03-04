@@ -13,46 +13,39 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        // Check DB first
-        try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email }
-          })
-          if (user && credentials.password === process.env.ADMIN_PASSWORD) {
-            return {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              image: user.image,
-              role: user.role,
-            }
-          }
-        } catch {
-          // DB not ready yet, fallback to env
-        }
-
-        // Fallback: hardcoded admin
+        // Admin hardcoded fallback
         if (
           credentials.email === process.env.ADMIN_EMAIL &&
           credentials.password === process.env.ADMIN_PASSWORD
         ) {
-          return {
-            id: 'tzaddik-001',
-            name: 'Tzaddik',
-            email: credentials.email,
-            role: 'TZADDIK',
+          // Also ensure admin exists in DB
+          try {
+            const admin = await prisma.user.upsert({
+              where: { email: credentials.email },
+              update: {},
+              create: { email: credentials.email, name: 'Tzaddik', role: 'TZADDIK', password: credentials.password }
+            })
+            return { id: admin.id, name: admin.name, email: admin.email, role: admin.role }
+          } catch {
+            return { id: 'tzaddik-001', name: 'Tzaddik', email: credentials.email, role: 'TZADDIK' }
           }
         }
+
+        // DB student login
+        try {
+          const user = await prisma.user.findUnique({ where: { email: credentials.email } })
+          if (user && user.password === credentials.password) {
+            return { id: user.id, name: user.name, email: user.email, role: user.role }
+          }
+        } catch { /* DB not ready */ }
+
         return null
       },
     }),
   ],
   callbacks: {
     jwt({ token, user }) {
-      if (user) {
-        token.role = (user as any).role
-        token.id = user.id
-      }
+      if (user) { token.role = (user as any).role; token.id = user.id }
       return token
     },
     session({ session, token }) {
@@ -63,8 +56,6 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  pages: {
-    signIn: '/auth/signin',
-  },
+  pages: { signIn: '/auth/signin' },
   session: { strategy: 'jwt' },
 }

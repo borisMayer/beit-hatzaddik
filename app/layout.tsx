@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cinzel, EB_Garamond } from 'next/font/google'
+import { Providers } from './providers'
 import './globals.css'
 
 const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', weight: ['400', '600', '700'] })
@@ -14,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${cinzel.variable} ${garamond.variable}`}>
       <body className="bg-[#0D0B08] text-[#F5EDD8] font-garamond antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )
