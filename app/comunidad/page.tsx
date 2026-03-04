@@ -52,9 +52,14 @@ export default function ComunidadPage() {
 
   const openPost = async (post: Post) => {
     setLoadingPost(true)
-    setActivePost(post)
+    setActivePost(null) // clear first to avoid partial render
     const r = await fetch(`/api/forum/${post.id}`)
-    if (r.ok) setActivePost(await r.json())
+    if (r.ok) {
+      const data = await r.json()
+      setActivePost(data)
+    } else {
+      setActivePost(post) // fallback to list data
+    }
     setLoadingPost(false)
     setTimeout(() => commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
   }
@@ -202,7 +207,7 @@ export default function ComunidadPage() {
               <p style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', letterSpacing: '0.2em', color: 'rgba(201,168,76,0.4)' }}>BEIT HATZADDIK</p>
               <p style={{ color: 'rgba(245,237,216,0.25)', fontStyle: 'italic', fontSize: '0.88rem' }}>Selecciona un post para leer o crea uno nuevo</p>
             </div>
-          ) : activePost && (
+          ) : activePost && activePost.user && (
             <div style={{ flex: 1, padding: '2rem 2.5rem', maxWidth: '700px' }}>
 
               {/* Post header */}
@@ -230,7 +235,7 @@ export default function ComunidadPage() {
               {/* Comments */}
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={{ fontSize: '0.65rem', letterSpacing: '0.25em', color: 'rgba(201,168,76,0.5)', marginBottom: '1.2rem' }}>
-                  RESPUESTAS · {activePost._count.comments}
+                  RESPUESTAS · {activePost._count?.comments ?? 0}
                 </div>
                 {loadingPost ? (
                   <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(245,237,216,0.25)', fontStyle: 'italic', fontSize: '0.85rem' }}>Cargando...</div>
