@@ -1,16 +1,40 @@
 import { NextResponse } from 'next/server'
-
-const SAMPLE_POSTS = [
-  { id: '1', title: 'Parashá Bereshit: La Creación y el Ein Sof', content: '...', userId: '1', user: { name: 'Tzaddik', image: null }, commentCount: 7, createdAt: new Date().toISOString() },
-  { id: '2', title: '¿Cómo integrar la logoterapia con la espiritualidad judía?', content: '...', userId: '2', user: { name: 'Discípulo1', image: null }, commentCount: 4, createdAt: new Date().toISOString() },
-  { id: '3', title: 'Reflexión sobre los Sefirot y la psique humana', content: '...', userId: '3', user: { name: 'Estudiante2', image: null }, commentCount: 12, createdAt: new Date().toISOString() },
-]
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 export async function GET() {
-  return NextResponse.json(SAMPLE_POSTS)
+  try {
+    const posts = await prisma.forumPost.findMany({
+      include: {
+        user: { select: { name: true, image: true } },
+        _count: { select: { comments: true } }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50
+    })
+    return NextResponse.json(posts)
+  } catch {
+    return NextResponse.json({ error: 'DB not ready' }, { status: 500 })
+  }
 }
 
 export async function POST(req: Request) {
-  const body = await req.json()
-  return NextResponse.json({ ...body, id: Date.now().toString() }, { status: 201 })
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const body = await req.json()
+    const post = await prisma.forumPost.create({
+      data: {
+        title: body.title,
+        content: body.content,
+        userId: (session.user as any).id,
+        courseId: body.courseId ?? null,
+      },
+      include: { user: { select: { name: true, image: true } }, _count: { select: { comments: true } } }
+    })
+    return NextResponse.json(post, { status: 201 })
+  } catch {
+    return NextResponse.json({ error: 'Error creating post' }, { status: 500 })
+  }
 }
