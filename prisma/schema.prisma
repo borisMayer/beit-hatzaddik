@@ -49,8 +49,9 @@ model Course {
   lessons     Lesson[]
   enrollments Enrollment[]
   forumPosts  ForumPost[]
-  payments    Payment[]
-  assignments Assignment[]
+  payments     Payment[]
+  assignments  Assignment[]
+  liveSessions LiveSession[]
 }
 
 model Lesson {
@@ -202,4 +203,21 @@ model Grade {
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([assignmentId, userId])
+}
+
+model LiveSession {
+  id          String   @id @default(cuid())
+  courseId    String?
+  title       String
+  description String?  @db.Text
+  meetingUrl  String
+  platform    String   @default("zoom") // zoom | meet | teams | youtube | other
+  scheduledAt DateTime
+  duration    Int      @default(60) // minutes
+  recordingUrl String?
+  materials   String?  @db.Text // JSON array of {name, url}
+  isGlobal    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  course      Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
 }

@@ -52,6 +52,7 @@ export default async function HomePage() {
           <Link href="/comunidad" className="px-8 py-3 border border-[#F5EDD8]/20 text-[#F5EDD8]/60 font-cinzel tracking-widest text-sm rounded hover:border-[#F5EDD8]/40 transition-colors">COMUNIDAD</Link>
           <Link href="/precios" className="px-8 py-3 border border-[#C9A84C]/40 text-[#C9A84C] font-cinzel tracking-widest text-sm rounded hover:bg-[#C9A84C]/10 transition-colors">PRECIOS</Link>
           <Link href="/academico" className="px-8 py-3 border border-[#F5EDD8]/20 text-[#F5EDD8]/60 font-cinzel tracking-widest text-sm rounded hover:border-[#C9A84C]/30 hover:text-[#C9A84C] transition-colors">ACADÉMICO</Link>
+          <Link href="/clases-en-vivo" className="px-8 py-3 border border-[#F5EDD8]/20 text-[#F5EDD8]/60 font-cinzel tracking-widest text-sm rounded hover:border-[#C9A84C]/30 hover:text-[#C9A84C] transition-colors">EN VIVO</Link>
         </div>
       </div>
 

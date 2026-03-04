@@ -15,6 +15,8 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
   const [progress, setProgress] = useState<Map<string, boolean>>(new Map())
   const [loading, setLoading] = useState(true)
   const [completing, setCompleting] = useState(false)
+  const [courseTab, setCourseTab] = useState<'lecciones' | 'sincronicas'>('lecciones')
+  const [liveSessions, setLiveSessions] = useState<any[]>([])
 
   useEffect(() => {
     fetch(`/api/courses/${id}`)
@@ -140,7 +142,24 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* Sidebar — lesson list */}
-        <aside style={{ width: '280px', borderRight: '1px solid rgba(201,168,76,0.08)', overflowY: 'auto', flexShrink: 0, background: 'rgba(0,0,0,0.2)' }}>
+        <aside style={{ width: '280px', borderRight: '1px solid rgba(201,168,76,0.08)', display: 'flex', flexDirection: 'column', flexShrink: 0, background: 'rgba(0,0,0,0.2)' }}>
+          {/* Tab switcher: Asíncrono / En Vivo */}
+          <div style={{ display: 'flex', borderBottom: '1px solid rgba(201,168,76,0.08)', flexShrink: 0 }}>
+            {([['lecciones', '📹 Asíncrono'], ['sincronicas', '🎥 En Vivo']] as [string,string][]).map(([id, label]) => (
+              <button key={id} onClick={() => setCourseTab(id as any)}
+                style={{ flex: 1, padding: '0.65rem 0.4rem', background: courseTab === id ? 'rgba(201,168,76,0.08)' : 'transparent', border: 'none', borderBottom: `2px solid ${courseTab === id ? '#C9A84C' : 'transparent'}`, color: courseTab === id ? '#C9A84C' : 'rgba(245,237,216,0.4)', fontSize: '0.65rem', letterSpacing: '0.08em', cursor: 'pointer', fontFamily: 'Georgia, serif', transition: 'all 0.15s' }}>
+                {label}
+                {id === 'sincronicas' && liveSessions.filter((s: any) => new Date(s.scheduledAt) > new Date()).length > 0 && (
+                  <span style={{ marginLeft: '0.25rem', fontSize: '0.58rem', background: 'rgba(224,85,85,0.2)', color: '#E05555', padding: '0.05rem 0.3rem', borderRadius: '10px' }}>
+                    {liveSessions.filter((s: any) => new Date(s.scheduledAt) > new Date()).length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {courseTab === 'lecciones' ? (
+          <div style={{ overflowY: 'auto', flex: 1 }}>
           <div style={{ padding: '1.2rem 1.2rem 0.75rem', borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
             <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.6rem', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.5)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>CONTENIDO DEL CURSO</div>
             <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.72rem', color: 'rgba(245,237,216,0.4)' }}>{totalCount} lecciones</div>
@@ -164,6 +183,45 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
               )
             })}
           </div>
+          </div>
+          ) : (
+          /* 🎥 LIVE SESSIONS panel */
+          <div style={{ overflowY: 'auto', flex: 1, padding: '1rem' }}>
+            <div style={{ fontSize: '0.6rem', letterSpacing: '0.25em', color: '#7a6230', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Clases en Vivo</div>
+            {liveSessions.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem 0.5rem' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
+                <p style={{ fontSize: '0.75rem', color: 'rgba(245,237,216,0.3)', fontStyle: 'italic', lineHeight: 1.5 }}>Sin clases en vivo para este curso</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {[...liveSessions].sort((a: any,b: any) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()).map((s: any) => {
+                  const live = (() => { const st=new Date(s.scheduledAt).getTime(); return Date.now()>=st && Date.now()<=st+s.duration*60000 })()
+                  const past = new Date(s.scheduledAt) < new Date() && !live
+                  const mats = s.materials ? JSON.parse(s.materials) : []
+                  return (
+                    <div key={s.id} style={{ padding: '0.85rem', border: `1px solid ${live ? 'rgba(224,85,85,0.4)' : 'rgba(201,168,76,0.12)'}`, borderRadius: '7px', background: live ? 'rgba(224,85,85,0.04)' : 'rgba(255,255,255,0.02)' }}>
+                      {live && <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.35rem' }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E05555' }} /><span style={{ fontSize: '0.58rem', letterSpacing: '0.15em', color: '#E05555' }}>EN VIVO</span></div>}
+                      <div style={{ fontSize: '0.82rem', color: '#F5EDD8', marginBottom: '0.25rem', lineHeight: 1.3 }}>{s.title}</div>
+                      {s.description && <div style={{ fontSize: '0.72rem', color: 'rgba(245,237,216,0.45)', marginBottom: '0.3rem', lineHeight: 1.4 }}>{s.description}</div>}
+                      <div style={{ fontSize: '0.65rem', color: 'rgba(245,237,216,0.35)', marginBottom: '0.5rem' }}>
+                        {new Date(s.scheduledAt).toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' })} · {new Date(s.scheduledAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} · {s.duration}min
+                      </div>
+                      {mats.length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginBottom: '0.5rem' }}>{mats.map((m: any, i: number) => <a key={i} href={m.url} target='_blank' rel='noopener noreferrer' style={{ fontSize: '0.62rem', color: '#C9A84C', textDecoration: 'none', padding: '0.1rem 0.4rem', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '10px' }}>📎 {m.name}</a>)}</div>}
+                      {!past ? (
+                        <a href={s.meetingUrl} target='_blank' rel='noopener noreferrer' style={{ display: 'block', textAlign: 'center', padding: '0.45rem', background: live ? '#E05555' : '#C9A84C', color: '#0D0B08', borderRadius: '5px', textDecoration: 'none', fontSize: '0.68rem', letterSpacing: '0.1em', fontFamily: 'Georgia, serif', fontWeight: 'bold' }}>
+                          {live ? '▶ UNIRSE' : '🔗 ENLACE'}
+                        </a>
+                      ) : s.recordingUrl ? (
+                        <a href={s.recordingUrl} target='_blank' rel='noopener noreferrer' style={{ display: 'block', textAlign: 'center', padding: '0.45rem', background: 'rgba(123,109,181,0.12)', border: '1px solid rgba(123,109,181,0.25)', color: '#7B6DB5', borderRadius: '5px', textDecoration: 'none', fontSize: '0.68rem', fontFamily: 'Georgia, serif' }}>🎬 Grabación</a>
+                      ) : <div style={{ fontSize: '0.65rem', color: 'rgba(245,237,216,0.2)', fontStyle: 'italic', textAlign: 'center' }}>Sin grabación</div>}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+          )}
         </aside>
 
         {/* Main lesson viewer */}
