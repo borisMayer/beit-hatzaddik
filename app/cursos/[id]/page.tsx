@@ -204,7 +204,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                 <button
                   onClick={() => { const idx = course.lessons.findIndex(l => l.id === activeLesson.id); if (idx > 0) setActiveLesson(course.lessons[idx - 1]) }}
                   disabled={course.lessons.findIndex(l => l.id === activeLesson.id) === 0}
-                  style={{ fontFamily: 'Georgia, serif', fontSize: '0.75rem', letterSpacing: '0.15em', padding: '0.6rem 1.2rem', background: 'transparent', border: '1px solid rgba(245,237,216,0.15)', borderRadius: '5px', color: 'rgba(245,237,216,0.4)', cursor: 'pointer', disabled: { opacity: 0.3 } as any }}>
+                  style={{ fontFamily: 'Georgia, serif', fontSize: '0.75rem', letterSpacing: '0.15em', padding: '0.6rem 1.2rem', background: 'transparent', border: '1px solid rgba(245,237,216,0.15)', borderRadius: '5px', color: 'rgba(245,237,216,0.4)', cursor: 'pointer', opacity: course.lessons.findIndex(l => l.id === activeLesson.id) === 0 ? 0.3 : 1 }}>
                   ← ANTERIOR
                 </button>
 
