@@ -95,13 +95,22 @@ export default function ComunidadPage() {
   const submitComment = async () => {
     if (!newComment.trim() || !activePost) return
     setSubmitting(true)
-    const r = await fetch(`/api/forum/${activePost.id}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: newComment }) })
+    const postId = activePost.id
+    const r = await fetch(`/api/forum/${postId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: newComment })
+    })
     if (r.ok) {
-      const comment = await r.json()
-      setActivePost(p => p ? { ...p, comments: [...(p.comments ?? []), comment], _count: { comments: (p._count.comments) + 1 } } : p)
-      setPosts(p => p.map(post => post.id === activePost.id ? { ...post, _count: { comments: post._count.comments + 1 } } : post))
       setNewComment('')
-      setTimeout(() => commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+      // Reload the full post to get updated comments with user data
+      const refresh = await fetch(`/api/forum/${postId}`)
+      if (refresh.ok) {
+        const updated = await refresh.json()
+        setActivePost(updated)
+        setPosts(p => p.map(post => post.id === postId ? { ...post, _count: { comments: updated._count?.comments ?? post._count.comments + 1 } } : post))
+      }
+      setTimeout(() => commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 200)
     }
     setSubmitting(false)
   }
