@@ -62,14 +62,15 @@ export default function ComunidadPage() {
   useEffect(() => { fetchPosts() }, [])
 
   // Poll for new comments every 10s when a post is open
+  const activePostId = activePost?.id ?? null
   useEffect(() => {
-    if (!activePost) return
+    if (!activePostId) return
     const interval = setInterval(async () => {
-      const r = await fetch(`/api/forum/${activePost.id}`)
+      const r = await fetch(`/api/forum/${activePostId}`)
       if (r.ok) setActivePost(await r.json())
     }, 10000)
     return () => clearInterval(interval)
-  }, [activePost?.id])
+  }, [activePostId])
 
   const submitPost = async () => {
     if (!newPost.title.trim() || !newPost.content.trim()) { showToast('Completa título y contenido'); return }
