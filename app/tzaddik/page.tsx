@@ -141,7 +141,7 @@ export default function TzaddikPanel() {
           </div>
           <nav style={{ padding: '1.2rem 0' }}>
             {tabs.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{ width: '100%', textAlign: 'left', padding: '0.65rem 1.4rem', display: 'flex', alignItems: 'center', gap: '0.65rem', background: tab === t.id ? 'rgba(201,168,76,0.09)' : 'transparent', borderLeft: `2px solid ${tab === t.id ? G.gold : 'transparent'}`, color: tab === t.id ? G.gold : 'rgba(245,237,216,0.45)', fontSize: '0.83rem', letterSpacing: '0.08em', cursor: 'pointer', border: 'none', borderLeft: `2px solid ${tab === t.id ? G.gold : 'transparent'}` }}>
+              <button key={t.id} onClick={() => setTab(t.id)} style={{ width: '100%', textAlign: 'left', padding: '0.65rem 1.4rem', display: 'flex', alignItems: 'center', gap: '0.65rem', background: tab === t.id ? 'rgba(201,168,76,0.09)' : 'transparent', borderLeft: `2px solid ${tab === t.id ? G.gold : 'transparent'}`, color: tab === t.id ? G.gold : 'rgba(245,237,216,0.45)', fontSize: '0.83rem', letterSpacing: '0.08em', cursor: 'pointer' }}>
                 <span>{t.icon}</span><span>{t.label}</span>
               </button>
             ))}
