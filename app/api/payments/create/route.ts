@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   try {
     const { type, courseId } = await req.json()
     const userId = (session.user as any).id
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://beit-hatzaddik.vercel.app'
+    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://beit-hatzaddik.org'
 
     let items: any[] = []
     let amount = 0

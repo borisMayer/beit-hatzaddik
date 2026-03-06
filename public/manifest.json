@@ -2,7 +2,7 @@
   "name": "Beit HaTzaddik",
   "short_name": "Beit HaTzaddik",
   "description": "Formación espiritual integrada: teología reformada, tradición judía y psicología profunda",
-  "start_url": "/",
+  "start_url": "https://beit-hatzaddik.org/",
   "display": "standalone",
   "background_color": "#0D0B08",
   "theme_color": "#C9A84C",
@@ -86,5 +86,6 @@
       "url": "/dashboard",
       "description": "Ver progreso"
     }
-  ]
+  ],
+  "scope": "https://beit-hatzaddik.org/"
 }
