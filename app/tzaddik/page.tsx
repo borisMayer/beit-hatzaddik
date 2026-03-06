@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 type Stats = { users: number; courses: number; enrollments: number; posts: number }
 type User = { id: string; name: string | null; email: string; role: string; createdAt: string; _count: { enrollments: number; posts: number } }
-type Course = { id: string; title: string; description: string; category: string; published: boolean; order: number; _count: { lessons: number; enrollments: number } }
+type Course = { id: string; title: string; description: string; category: string; published: boolean; order: number; isFree: boolean; price: number; _count: { lessons: number; enrollments: number } }
 type Lesson = { id: string; courseId: string; title: string; content: string; videoUrl: string | null; order: number }
 type Tab = 'dashboard' | 'students' | 'courses' | 'new-course' | 'lessons' | 'payments'
 
@@ -104,7 +104,7 @@ export default function TzaddikPanel() {
   const [activeCourse, setActiveCourse] = useState<Course | null>(null)
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState('')
-  const [newCourse, setNewCourse] = useState({ title: '', description: '', category: '', published: false })
+  const [newCourse, setNewCourse] = useState({ title: '', description: '', category: '', published: false, isFree: true, price: 0 })
   const [newLesson, setNewLesson] = useState({ title: '', content: '', videoUrl: '' })
   const [editLesson, setEditLesson] = useState<Lesson | null>(null)
   const [showLessonForm, setShowLessonForm] = useState(false)
@@ -148,7 +148,7 @@ export default function TzaddikPanel() {
   const createCourse = async () => {
     if (!newCourse.title || !newCourse.description || !newCourse.category) { showToast('Completa todos los campos'); return }
     const r = await fetch('/api/admin/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newCourse) })
-    if (r.ok) { setNewCourse({ title: '', description: '', category: '', published: false }); setTab('courses'); showToast('¡Curso creado! ✓') }
+    if (r.ok) { setNewCourse({ title: '', description: '', category: '', published: false, isFree: true, price: 0 }); setTab('courses'); showToast('¡Curso creado! ✓') }
   }
   const createLesson = async () => {
     if (!newLesson.title || !newLesson.content) { showToast('Título y contenido son requeridos'); return }
@@ -315,6 +315,10 @@ export default function TzaddikPanel() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.25rem' }}>
                           <span style={{ fontSize: '0.93rem', color: G.parchment }}>{c.title}</span>
                           <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', padding: '0.12rem 0.55rem', borderRadius: '20px', background: 'rgba(201,168,76,0.09)', border: '1px solid rgba(201,168,76,0.18)', color: G.gold }}>{c.category}</span>
+                        {c.isFree
+                          ? <span style={{ fontSize: '0.58rem', letterSpacing: '0.12em', padding: '0.1rem 0.45rem', borderRadius: '20px', background: 'rgba(74,155,127,0.1)', border: '1px solid rgba(74,155,127,0.2)', color: '#4A9B7F' }}>GRATIS</span>
+                          : <span style={{ fontSize: '0.58rem', letterSpacing: '0.1em', padding: '0.1rem 0.45rem', borderRadius: '20px', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.18)', color: G.gold }}>USD ${c.price}</span>
+                        }
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'rgba(245,237,216,0.38)' }}>
                           {c._count.lessons} lecciones · {c._count.enrollments} matriculados
@@ -324,6 +328,12 @@ export default function TzaddikPanel() {
                         <span style={{ fontSize: '0.68rem', letterSpacing: '0.08em', color: c.published ? '#4A9B7F' : 'rgba(245,237,216,0.28)' }}>● {c.published ? 'PUBLICADO' : 'OCULTO'}</span>
                         <button onClick={() => openLessons(c)} style={btn('primary', { fontSize: '0.68rem' })}>📝 LECCIONES</button>
                         <button onClick={() => togglePublish(c)} style={btn('secondary', { fontSize: '0.68rem' })}>{c.published ? 'OCULTAR' : 'PUBLICAR'}</button>
+                        <button onClick={async () => {
+                          const price = c.isFree ? 0 : parseFloat(prompt(`Precio USD para "${c.title}" (0 = gratis):`, String(c.price)) ?? String(c.price))
+                          const isFree = price === 0
+                          await fetch('/api/admin/courses', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: c.id, price, isFree }) })
+                          fetchCourses(); showToast(isFree ? 'Curso marcado como gratuito ✓' : `Precio actualizado: USD $${price} ✓`)
+                        }} style={btn('ghost', { fontSize: '0.68rem', padding: '0.3rem 0.6rem' })}>💳</button>
                         <button onClick={() => deleteCourse(c.id)} style={btn('danger', { fontSize: '0.68rem' })}>ELIMINAR</button>
                       </div>
                     </div>
@@ -349,6 +359,29 @@ export default function TzaddikPanel() {
                     <label style={label}>DESCRIPCIÓN</label>
                     <textarea value={newCourse.description} onChange={e => setNewCourse(p => ({...p,description:e.target.value}))} placeholder="Describe el contenido y objetivo..." rows={4} style={input({resize:'vertical'})} />
                   </div>
+                  {/* Precio */}
+                  <div>
+                    <label style={label}>MODALIDAD DE ACCESO</label>
+                    <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.6rem' }}>
+                      <button onClick={() => setNewCourse(p => ({...p, isFree: true, price: 0}))}
+                        style={{ flex: 1, padding: '0.55rem', border: `1px solid ${newCourse.isFree ? '#4A9B7F' : 'rgba(245,237,216,0.12)'}`, borderRadius: '6px', background: newCourse.isFree ? 'rgba(74,155,127,0.1)' : 'transparent', color: newCourse.isFree ? '#4A9B7F' : 'rgba(245,237,216,0.4)', cursor: 'pointer', fontSize: '0.72rem', letterSpacing: '0.15em', fontFamily: 'Georgia, serif' }}>
+                        ✓ GRATUITO
+                      </button>
+                      <button onClick={() => setNewCourse(p => ({...p, isFree: false, price: p.price || 9}))}
+                        style={{ flex: 1, padding: '0.55rem', border: `1px solid ${!newCourse.isFree ? '#C9A84C' : 'rgba(245,237,216,0.12)'}`, borderRadius: '6px', background: !newCourse.isFree ? 'rgba(201,168,76,0.08)' : 'transparent', color: !newCourse.isFree ? '#C9A84C' : 'rgba(245,237,216,0.4)', cursor: 'pointer', fontSize: '0.72rem', letterSpacing: '0.15em', fontFamily: 'Georgia, serif' }}>
+                        💳 DE PAGO
+                      </button>
+                    </div>
+                    {!newCourse.isFree && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.82rem', color: 'rgba(245,237,216,0.5)' }}>USD $</span>
+                        <input type="number" min="1" step="0.01" value={newCourse.price || ''} onChange={e => setNewCourse(p => ({...p, price: parseFloat(e.target.value) || 0}))}
+                          placeholder="Ej: 19.99" style={{...input(), width: '140px'}} />
+                        <span style={{ fontSize: '0.72rem', color: 'rgba(245,237,216,0.3)', fontStyle: 'italic' }}>precio por curso</span>
+                      </div>
+                    )}
+                  </div>
+
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                     <input type="checkbox" id="pub" checked={newCourse.published} onChange={e => setNewCourse(p => ({...p,published:e.target.checked}))} style={{ accentColor: G.gold, width:'15px', height:'15px', cursor:'pointer' }} />
                     <label htmlFor="pub" style={{ fontSize: '0.83rem', color: 'rgba(245,237,216,0.55)', cursor:'pointer' }}>Publicar inmediatamente</label>
