@@ -108,6 +108,8 @@ export default function TzaddikPanel() {
   const [newLesson, setNewLesson] = useState({ title: '', content: '', videoUrl: '' })
   const [editLesson, setEditLesson] = useState<Lesson | null>(null)
   const [showLessonForm, setShowLessonForm] = useState(false)
+  const [editingPrice, setEditingPrice] = useState<string | null>(null)
+  const [priceInput, setPriceInput] = useState('')
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000) }
 
@@ -310,32 +312,83 @@ export default function TzaddikPanel() {
               {loading ? <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(245,237,216,0.3)', fontStyle: 'italic' }}>Cargando...</div> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
                   {courses.map(c => (
-                    <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.3rem', border: '1px solid rgba(201,168,76,0.13)', borderRadius: '8px', background: 'rgba(255,255,255,0.02)' }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.25rem' }}>
-                          <span style={{ fontSize: '0.93rem', color: G.parchment }}>{c.title}</span>
-                          <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', padding: '0.12rem 0.55rem', borderRadius: '20px', background: 'rgba(201,168,76,0.09)', border: '1px solid rgba(201,168,76,0.18)', color: G.gold }}>{c.category}</span>
-                        {c.isFree
-                          ? <span style={{ fontSize: '0.58rem', letterSpacing: '0.12em', padding: '0.1rem 0.45rem', borderRadius: '20px', background: 'rgba(74,155,127,0.1)', border: '1px solid rgba(74,155,127,0.2)', color: '#4A9B7F' }}>GRATIS</span>
-                          : <span style={{ fontSize: '0.58rem', letterSpacing: '0.1em', padding: '0.1rem 0.45rem', borderRadius: '20px', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.18)', color: G.gold }}>USD ${c.price}</span>
-                        }
+                    <div key={c.id} style={{ border: '1px solid rgba(201,168,76,0.13)', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', overflow: 'hidden' }}>
+                      {/* Main row */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.3rem' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '0.93rem', color: G.parchment }}>{c.title}</span>
+                            <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', padding: '0.12rem 0.55rem', borderRadius: '20px', background: 'rgba(201,168,76,0.09)', border: '1px solid rgba(201,168,76,0.18)', color: G.gold }}>{c.category}</span>
+                            {c.isFree
+                              ? <span style={{ fontSize: '0.58rem', letterSpacing: '0.12em', padding: '0.1rem 0.45rem', borderRadius: '20px', background: 'rgba(74,155,127,0.1)', border: '1px solid rgba(74,155,127,0.2)', color: '#4A9B7F' }}>✓ GRATIS</span>
+                              : <span style={{ fontSize: '0.58rem', letterSpacing: '0.1em', padding: '0.1rem 0.45rem', borderRadius: '20px', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.18)', color: G.gold }}>💳 USD ${c.price}</span>
+                            }
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'rgba(245,237,216,0.38)' }}>
+                            {c._count.lessons} lecciones · {c._count.enrollments} matriculados
+                          </div>
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: 'rgba(245,237,216,0.38)' }}>
-                          {c._count.lessons} lecciones · {c._count.enrollments} matriculados
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                          <span style={{ fontSize: '0.68rem', letterSpacing: '0.08em', color: c.published ? '#4A9B7F' : 'rgba(245,237,216,0.28)' }}>● {c.published ? 'PUBLICADO' : 'OCULTO'}</span>
+                          <button onClick={() => openLessons(c)} style={btn('primary', { fontSize: '0.68rem' })}>📝 LECCIONES</button>
+                          <button onClick={() => togglePublish(c)} style={btn('secondary', { fontSize: '0.68rem' })}>{c.published ? 'OCULTAR' : 'PUBLICAR'}</button>
+                          <button onClick={() => { setEditingPrice(editingPrice === c.id ? null : c.id); setPriceInput(c.isFree ? '' : String(c.price)) }}
+                            style={{ padding: '0.3rem 0.7rem', background: editingPrice === c.id ? 'rgba(201,168,76,0.12)' : 'transparent', border: `1px solid ${editingPrice === c.id ? G.gold : 'rgba(201,168,76,0.2)'}`, borderRadius: '4px', color: G.gold, fontSize: '0.65rem', letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
+                            💳 PRECIO
+                          </button>
+                          <button onClick={() => deleteCourse(c.id)} style={btn('danger', { fontSize: '0.68rem' })}>ELIMINAR</button>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                        <span style={{ fontSize: '0.68rem', letterSpacing: '0.08em', color: c.published ? '#4A9B7F' : 'rgba(245,237,216,0.28)' }}>● {c.published ? 'PUBLICADO' : 'OCULTO'}</span>
-                        <button onClick={() => openLessons(c)} style={btn('primary', { fontSize: '0.68rem' })}>📝 LECCIONES</button>
-                        <button onClick={() => togglePublish(c)} style={btn('secondary', { fontSize: '0.68rem' })}>{c.published ? 'OCULTAR' : 'PUBLICAR'}</button>
-                        <button onClick={async () => {
-                          const price = c.isFree ? 0 : parseFloat(prompt(`Precio USD para "${c.title}" (0 = gratis):`, String(c.price)) ?? String(c.price))
-                          const isFree = price === 0
-                          await fetch('/api/admin/courses', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: c.id, price, isFree }) })
-                          fetchCourses(); showToast(isFree ? 'Curso marcado como gratuito ✓' : `Precio actualizado: USD $${price} ✓`)
-                        }} style={btn('ghost', { fontSize: '0.68rem', padding: '0.3rem 0.6rem' })}>💳</button>
-                        <button onClick={() => deleteCourse(c.id)} style={btn('danger', { fontSize: '0.68rem' })}>ELIMINAR</button>
-                      </div>
+
+                      {/* Inline price editor */}
+                      {editingPrice === c.id && (
+                        <div style={{ padding: '1rem 1.3rem', background: 'rgba(201,168,76,0.04)', borderTop: '1px solid rgba(201,168,76,0.1)', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                          <div style={{ fontSize: '0.62rem', letterSpacing: '0.2em', color: G.goldDim }}>MODALIDAD DE ACCESO</div>
+                          {/* Toggle buttons */}
+                          <div style={{ display: 'flex', gap: '0.4rem' }}>
+                            <button
+                              onClick={async () => {
+                                await fetch('/api/admin/courses', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: c.id, isFree: true, price: 0 }) })
+                                fetchCourses(); setEditingPrice(null); showToast('Curso marcado como gratuito ✓')
+                              }}
+                              style={{ padding: '0.4rem 0.9rem', border: `1px solid ${c.isFree ? '#4A9B7F' : 'rgba(74,155,127,0.25)'}`, borderRadius: '5px', background: c.isFree ? 'rgba(74,155,127,0.12)' : 'transparent', color: c.isFree ? '#4A9B7F' : 'rgba(245,237,216,0.4)', cursor: 'pointer', fontSize: '0.7rem', letterSpacing: '0.12em', fontFamily: 'Georgia, serif' }}>
+                              ✓ GRATUITO
+                            </button>
+                            <button
+                              onClick={() => { /* just focus the price input */ document.getElementById(`price-${c.id}`)?.focus() }}
+                              style={{ padding: '0.4rem 0.9rem', border: `1px solid ${!c.isFree ? G.gold : 'rgba(201,168,76,0.2)'}`, borderRadius: '5px', background: !c.isFree ? 'rgba(201,168,76,0.1)' : 'transparent', color: !c.isFree ? G.gold : 'rgba(245,237,216,0.4)', cursor: 'pointer', fontSize: '0.7rem', letterSpacing: '0.12em', fontFamily: 'Georgia, serif' }}>
+                              💳 DE PAGO
+                            </button>
+                          </div>
+                          {/* Price input */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <span style={{ fontSize: '0.82rem', color: 'rgba(245,237,216,0.5)' }}>USD $</span>
+                            <input
+                              id={`price-${c.id}`}
+                              type="number" min="0.01" step="0.01"
+                              value={priceInput}
+                              onChange={e => setPriceInput(e.target.value)}
+                              placeholder="0.00"
+                              style={{ width: '90px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '5px', padding: '0.4rem 0.6rem', color: G.parchment, fontSize: '0.82rem', outline: 'none', fontFamily: 'Georgia, serif' }}
+                            />
+                            <button
+                              onClick={async () => {
+                                const p = parseFloat(priceInput)
+                                if (!priceInput || isNaN(p) || p <= 0) { showToast('Ingresa un precio válido mayor a 0'); return }
+                                await fetch('/api/admin/courses', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: c.id, isFree: false, price: p }) })
+                                fetchCourses(); setEditingPrice(null); showToast(`Precio actualizado: USD $${p.toFixed(2)} ✓`)
+                              }}
+                              style={{ padding: '0.4rem 0.85rem', background: G.gold, color: G.ink, border: 'none', borderRadius: '5px', fontSize: '0.7rem', letterSpacing: '0.12em', cursor: 'pointer', fontFamily: 'Georgia, serif', fontWeight: 'bold' }}>
+                              GUARDAR
+                            </button>
+                            <button onClick={() => setEditingPrice(null)}
+                              style={{ padding: '0.4rem 0.65rem', background: 'transparent', border: '1px solid rgba(245,237,216,0.1)', borderRadius: '5px', color: 'rgba(245,237,216,0.35)', fontSize: '0.7rem', cursor: 'pointer' }}>
+                              ✕
+                            </button>
+                          </div>
+                          <span style={{ fontSize: '0.68rem', color: 'rgba(245,237,216,0.3)', fontStyle: 'italic' }}>Precio actual: {c.isFree ? 'Gratuito' : `USD $${c.price}`}</span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
