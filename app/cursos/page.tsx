@@ -104,35 +104,29 @@ export default function CursosPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
-              {/* GRATIS */}
-              {modal.isFree && (
-                <div style={{ padding: '1.1rem 1.3rem', border: `1px solid ${G.green}30`, borderRadius: '10px', background: `${G.green}06` }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                    <span style={{ fontFamily: 'Georgia, serif', fontSize: '0.65rem', letterSpacing: '0.22em', color: G.green }}>ACCESO GRATUITO</span>
-                    <span style={{ fontSize: '1.15rem', fontWeight: 'bold', color: G.green }}>Gratis</span>
-                  </div>
-                  <p style={{ fontSize: '0.76rem', color: 'rgba(245,237,216,0.4)', marginBottom: '0.75rem' }}>Acceso libre para estudiantes registrados.</p>
-                  <button onClick={() => enrollFree(modal.id)} disabled={enrolling === modal.id}
-                    style={{ width: '100%', padding: '0.65rem', background: G.green, color: G.ink, border: 'none', borderRadius: '6px', fontSize: '0.72rem', letterSpacing: '0.18em', cursor: 'pointer', fontFamily: 'Georgia, serif', fontWeight: 'bold', opacity: enrolling === modal.id ? 0.6 : 1 }}>
-                    {enrolling === modal.id ? 'MATRICULANDO...' : 'MATRICULARME GRATIS →'}
-                  </button>
+              {/* OPCIÓN 1: SOLO ESTE CURSO — siempre visible */}
+              <div style={{ padding: '1.1rem 1.3rem', border: '1px solid rgba(201,168,76,0.22)', borderRadius: '10px', background: 'rgba(201,168,76,0.04)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: '0.65rem', letterSpacing: '0.22em', color: G.gold }}>SOLO ESTE CURSO</span>
+                  <span style={{ fontSize: '1.15rem', fontWeight: 'bold', color: G.parchment }}>
+                    {modal.isFree ? 'Gratis' : `USD $${modal.price > 0 ? modal.price.toFixed(2) : '9.00'}`}
+                  </span>
                 </div>
-              )}
-
-              {/* PAGO POR CURSO */}
-              {!modal.isFree && (
-                <div style={{ padding: '1.1rem 1.3rem', border: '1px solid rgba(201,168,76,0.22)', borderRadius: '10px', background: 'rgba(201,168,76,0.04)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                    <span style={{ fontFamily: 'Georgia, serif', fontSize: '0.65rem', letterSpacing: '0.22em', color: G.gold }}>SOLO ESTE CURSO</span>
-                    <span style={{ fontSize: '1.15rem', fontWeight: 'bold', color: G.parchment }}>USD ${modal.price > 0 ? modal.price.toFixed(2) : '9.00'}</span>
-                  </div>
-                  <p style={{ fontSize: '0.76rem', color: 'rgba(245,237,216,0.4)', marginBottom: '0.75rem' }}>Acceso permanente. Pago único, sin suscripción.</p>
+                <p style={{ fontSize: '0.76rem', color: 'rgba(245,237,216,0.4)', marginBottom: '0.75rem' }}>
+                  {modal.isFree ? 'Acceso libre para estudiantes registrados. Sin costo.' : 'Acceso permanente a este curso. Pago único, sin suscripción.'}
+                </p>
+                {modal.isFree ? (
+                  <button onClick={() => enrollFree(modal.id)} disabled={enrolling === modal.id}
+                    style={{ width: '100%', padding: '0.65rem', background: G.gold, color: G.ink, border: 'none', borderRadius: '6px', fontSize: '0.72rem', letterSpacing: '0.18em', cursor: 'pointer', fontFamily: 'Georgia, serif', fontWeight: 'bold', opacity: enrolling === modal.id ? 0.6 : 1 }}>
+                    {enrolling === modal.id ? 'MATRICULANDO...' : 'ACCEDER A ESTE CURSO →'}
+                  </button>
+                ) : (
                   <button onClick={() => payCourse(modal.id)} disabled={paying !== null}
                     style={{ width: '100%', padding: '0.65rem', background: G.gold, color: G.ink, border: 'none', borderRadius: '6px', fontSize: '0.72rem', letterSpacing: '0.18em', cursor: 'pointer', fontFamily: 'Georgia, serif', fontWeight: 'bold', opacity: paying === 'course' ? 0.6 : 1 }}>
                     {paying === 'course' ? 'REDIRIGIENDO A PAGO...' : 'PAGAR ESTE CURSO →'}
                   </button>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* SUSCRIPCIÓN */}
               <div style={{ padding: '1.1rem 1.3rem', border: '1px solid rgba(123,109,181,0.28)', borderRadius: '10px', background: 'rgba(123,109,181,0.04)', position: 'relative', overflow: 'hidden' }}>
