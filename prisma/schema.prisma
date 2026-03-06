@@ -131,6 +131,7 @@ model SacredText {
   language    String   @default("he")
   fileUrl     String?
   description String?
+  isPremium   Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
 
